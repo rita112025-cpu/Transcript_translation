@@ -153,7 +153,7 @@ const statusColors: Record<TestStatus, string> = {
   'INTEGRATION TEST PASS': 'bg-blue-900/50 text-blue-300 border-blue-700',
   'REAL MODEL INFERENCE PASS': 'bg-emerald-900/50 text-emerald-300 border-emerald-700',
   'MANUAL TEST REQUIRED': 'bg-yellow-900/50 text-yellow-300 border-yellow-700',
-  'CANNOT VERIFY': 'bg-gray-700/50 text-gray-300 border-gray-600',
+  'CANNOT VERIFY': 'bg-[#1a1a1e]/50 text-zinc-300 border-white/15',
   'NOT IMPLEMENTED': 'bg-red-900/50 text-red-300 border-red-700',
 };
 
@@ -162,11 +162,11 @@ export default function TestVerification() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-white mb-2">✅ Phase 4：測試及驗收</h2>
-        <p className="text-gray-400">測試案例設計、執行指令及驗收標準。未實際執行的測試不標示 PASS。</p>
+        <p className="text-zinc-400">測試案例設計、執行指令及驗收標準。未實際執行的測試不標示 PASS。</p>
       </div>
 
       {/* Important Notice */}
-      <div className="bg-yellow-900/20 border border-yellow-800 rounded-xl p-4">
+      <div className="bg-yellow-900/20 border border-yellow-800 rounded-[20px] p-4">
         <p className="text-yellow-300 text-sm">
           ⚠️ <strong>重要聲明：</strong>以下測試案例已設計但尚未在實際環境中執行。所有測試狀態標示為 CANNOT VERIFY，
           表示需要在具備 NVIDIA API Key 及實際音訊檔案的環境中才能驗證。
@@ -175,24 +175,24 @@ export default function TestVerification() {
       </div>
 
       {/* Test Cases Table */}
-      <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+      <div className="bg-[#121214] rounded-[20px] border border-white/[0.08] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-900">
+            <thead className="bg-[#0a0a0b]">
               <tr>
-                <th className="text-left px-3 py-3 text-gray-300 font-medium w-12">ID</th>
-                <th className="text-left px-3 py-3 text-gray-300 font-medium">測試名稱</th>
-                <th className="text-left px-3 py-3 text-gray-300 font-medium w-40">狀態</th>
-                <th className="text-left px-3 py-3 text-gray-300 font-medium w-32">操作</th>
+                <th className="text-left px-3 py-3 text-zinc-300 font-medium w-12">ID</th>
+                <th className="text-left px-3 py-3 text-zinc-300 font-medium">測試名稱</th>
+                <th className="text-left px-3 py-3 text-zinc-300 font-medium w-40">狀態</th>
+                <th className="text-left px-3 py-3 text-zinc-300 font-medium w-32">操作</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-700">
+            <tbody className="divide-y divide-white/[0.08]">
               {testCases.map((tc) => (
-                <tr key={tc.id} className="hover:bg-gray-750">
-                  <td className="px-3 py-3 text-emerald-400 font-mono font-bold">{tc.id}</td>
+                <tr key={tc.id} className="hover:bg-[#121214]">
+                  <td className="px-3 py-3 text-zinc-100 font-mono font-bold">{tc.id}</td>
                   <td className="px-3 py-3">
                     <p className="text-white font-medium text-sm">{tc.name}</p>
-                    <p className="text-gray-400 text-xs mt-0.5">{tc.description}</p>
+                    <p className="text-zinc-400 text-xs mt-0.5">{tc.description}</p>
                   </td>
                   <td className="px-3 py-3">
                     <span className={`px-2 py-1 rounded text-xs border ${statusColors[tc.status]}`}>
@@ -202,8 +202,8 @@ export default function TestVerification() {
                   <td className="px-3 py-3">
                     <details className="text-xs">
                       <summary className="text-blue-400 cursor-pointer hover:text-blue-300">詳情</summary>
-                      <div className="mt-2 p-2 bg-gray-900 rounded space-y-1">
-                        {tc.command && <p className="text-gray-400"><code className="text-emerald-400">{tc.command}</code></p>}
+                      <div className="mt-2 p-2 bg-[#0a0a0b] rounded space-y-1">
+                        {tc.command && <p className="text-zinc-400"><code className="text-zinc-100">{tc.command}</code></p>}
                         <p className="text-green-400">✓ {tc.successCriteria}</p>
                         <p className="text-red-400">✗ {tc.failureDiagnosis}</p>
                       </div>
@@ -217,19 +217,19 @@ export default function TestVerification() {
       </div>
 
       {/* Acceptance Table */}
-      <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+      <div className="bg-[#121214] rounded-[20px] p-6 border border-white/[0.08]">
         <h3 className="text-lg font-semibold text-white mb-4">📋 功能驗收表</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-900">
+            <thead className="bg-[#0a0a0b]">
               <tr>
-                <th className="text-left px-4 py-2 text-gray-300">功能</th>
-                <th className="text-left px-4 py-2 text-gray-300">狀態</th>
-                <th className="text-left px-4 py-2 text-gray-300">驗證方法</th>
-                <th className="text-left px-4 py-2 text-gray-300">限制</th>
+                <th className="text-left px-4 py-2 text-zinc-300">功能</th>
+                <th className="text-left px-4 py-2 text-zinc-300">狀態</th>
+                <th className="text-left px-4 py-2 text-zinc-300">驗證方法</th>
+                <th className="text-left px-4 py-2 text-zinc-300">限制</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-700">
+            <tbody className="divide-y divide-white/[0.08]">
               {[
                 ['音訊上傳（WAV/MP3/M4A/FLAC）', 'CANNOT VERIFY', '上傳各格式檔案', '最大 500MB'],
                 ['音訊格式驗證', 'CANNOT VERIFY', '上傳非音訊檔案', '依賴 magic bytes'],
@@ -254,8 +254,8 @@ export default function TestVerification() {
                       {status}
                     </span>
                   </td>
-                  <td className="px-4 py-2 text-gray-400">{method}</td>
-                  <td className="px-4 py-2 text-gray-400">{limit}</td>
+                  <td className="px-4 py-2 text-zinc-400">{method}</td>
+                  <td className="px-4 py-2 text-zinc-400">{limit}</td>
                 </tr>
               ))}
             </tbody>
@@ -264,17 +264,17 @@ export default function TestVerification() {
       </div>
 
       {/* CER Evaluation */}
-      <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+      <div className="bg-[#121214] rounded-[20px] p-6 border border-white/[0.08]">
         <h3 className="text-lg font-semibold text-white mb-4">📊 CER 評估計畫</h3>
-        <div className="text-sm text-gray-300 space-y-3">
+        <div className="text-sm text-zinc-300 space-y-3">
           <p>建立小型人工校對資料集（建議 10-20 段，每段 30-60 秒），計算 Character Error Rate：</p>
-          <div className="bg-gray-900 rounded-lg p-4 font-mono text-xs">
-            <p className="text-gray-400"># CER 計算公式</p>
-            <p className="text-emerald-400">CER = (S + D + I) / N × 100%</p>
-            <p className="text-gray-400 mt-2"># S = 替換錯誤數, D = 刪除錯誤數, I = 插入錯誤數, N = 參考文字總字數</p>
-            <p className="text-gray-400 mt-2"># 建議使用 jiwer 或 editdistance 套件計算</p>
-            <p className="text-emerald-400 mt-2">pip install jiwer</p>
-            <p className="text-emerald-400">python -c "from jiwer import cer; print(cer('參考文字', 'ASR輸出'))"</p>
+          <div className="bg-[#0a0a0b] rounded-[14px] p-4 font-mono text-xs">
+            <p className="text-zinc-400"># CER 計算公式</p>
+            <p className="text-zinc-100">CER = (S + D + I) / N × 100%</p>
+            <p className="text-zinc-400 mt-2"># S = 替換錯誤數, D = 刪除錯誤數, I = 插入錯誤數, N = 參考文字總字數</p>
+            <p className="text-zinc-400 mt-2"># 建議使用 jiwer 或 editdistance 套件計算</p>
+            <p className="text-zinc-100 mt-2">pip install jiwer</p>
+            <p className="text-zinc-100">python -c "from jiwer import cer; print(cer('參考文字', 'ASR輸出'))"</p>
           </div>
           <p className="text-yellow-300">⚠️ 實際 CER 數值需使用真實音訊及模型推論結果才能獲得。不得憑空產出準確率數據。</p>
         </div>

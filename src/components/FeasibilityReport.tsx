@@ -132,20 +132,20 @@ export default function FeasibilityReport() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-white mb-2">Phase 0：技術可行性驗證報告</h2>
-        <p className="text-gray-400">基於 NVIDIA 官方文件之查核結果。每項結論標記驗證狀態。</p>
+        <p className="text-zinc-400">基於 NVIDIA 官方文件之查核結果。每項結論標記驗證狀態。</p>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-green-900/20 border border-green-800 rounded-xl p-4 text-center">
+        <div className="bg-green-900/20 border border-green-800 rounded-[20px] p-4 text-center">
           <div className="text-3xl font-bold text-green-400">{confirmed}</div>
           <div className="text-green-300 text-sm">已確認</div>
         </div>
-        <div className="bg-yellow-900/20 border border-yellow-800 rounded-xl p-4 text-center">
+        <div className="bg-yellow-900/20 border border-yellow-800 rounded-[20px] p-4 text-center">
           <div className="text-3xl font-bold text-yellow-400">{unverified}</div>
           <div className="text-yellow-300 text-sm">未確認</div>
         </div>
-        <div className="bg-red-900/20 border border-red-800 rounded-xl p-4 text-center">
+        <div className="bg-red-900/20 border border-red-800 rounded-[20px] p-4 text-center">
           <div className="text-3xl font-bold text-red-400">{unsupported}</div>
           <div className="text-red-300 text-sm">不支援</div>
         </div>
@@ -157,8 +157,8 @@ export default function FeasibilityReport() {
           <button
             key={s}
             onClick={() => setFilter(s)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              filter === s ? 'bg-emerald-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+            className={`px-3 py-1.5 rounded-[14px] text-sm font-medium transition-colors ${
+              filter === s ? 'bg-white text-black' : 'bg-[#121214] text-zinc-400 hover:text-white'
             }`}
           >
             {s === 'ALL' ? '全部' : statusLabels[s]}
@@ -167,28 +167,28 @@ export default function FeasibilityReport() {
       </div>
 
       {/* Findings Table */}
-      <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+      <div className="bg-[#121214] rounded-[20px] border border-white/[0.08] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-900">
+            <thead className="bg-[#0a0a0b]">
               <tr>
-                <th className="text-left px-4 py-3 text-gray-300 font-medium">項目</th>
-                <th className="text-left px-4 py-3 text-gray-300 font-medium w-32">狀態</th>
-                <th className="text-left px-4 py-3 text-gray-300 font-medium">說明</th>
-                <th className="text-left px-4 py-3 text-gray-300 font-medium">來源</th>
+                <th className="text-left px-4 py-3 text-zinc-300 font-medium">項目</th>
+                <th className="text-left px-4 py-3 text-zinc-300 font-medium w-32">狀態</th>
+                <th className="text-left px-4 py-3 text-zinc-300 font-medium">說明</th>
+                <th className="text-left px-4 py-3 text-zinc-300 font-medium">來源</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-700">
+            <tbody className="divide-y divide-white/[0.08]">
               {filtered.map((f, i) => (
-                <tr key={i} className="hover:bg-gray-750">
+                <tr key={i} className="hover:bg-[#121214]">
                   <td className="px-4 py-3 text-white font-medium">{f.item}</td>
                   <td className="px-4 py-3">
                     <span className={`px-2 py-1 rounded text-xs border ${statusColors[f.status]}`}>
                       {statusLabels[f.status]}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-gray-300 max-w-md">{f.detail}</td>
-                  <td className="px-4 py-3 text-gray-500 text-xs max-w-xs truncate">{f.source}</td>
+                  <td className="px-4 py-3 text-zinc-300 max-w-md">{f.detail}</td>
+                  <td className="px-4 py-3 text-zinc-500 text-xs max-w-xs truncate">{f.source}</td>
                 </tr>
               ))}
             </tbody>
@@ -197,9 +197,9 @@ export default function FeasibilityReport() {
       </div>
 
       {/* Recommendation */}
-      <div className="bg-blue-900/20 border border-blue-800 rounded-xl p-6">
+      <div className="bg-blue-900/20 border border-blue-800 rounded-[20px] p-6">
         <h3 className="text-lg font-semibold text-blue-300 mb-3">📌 推薦部署策略</h3>
-        <div className="space-y-3 text-gray-300 text-sm">
+        <div className="space-y-3 text-zinc-300 text-sm">
           <p><strong className="text-white">主要方案：NVIDIA NIM Cloud API</strong></p>
           <ul className="list-disc list-inside space-y-1 ml-4">
             <li>無需本地 GPU，Windows 原生 Python 即可使用</li>

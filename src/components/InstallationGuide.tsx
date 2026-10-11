@@ -7,7 +7,7 @@ export default function InstallationGuide() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-white mb-2">⚙️ 安裝與執行指南</h2>
-        <p className="text-gray-400">Windows 10/11 環境，可直接複製執行的 PowerShell 指令</p>
+        <p className="text-zinc-400">Windows 10/11 環境，可直接複製執行的 PowerShell 指令</p>
       </div>
 
       {/* Section Tabs */}
@@ -21,8 +21,8 @@ export default function InstallationGuide() {
           <button
             key={s.id}
             onClick={() => setActiveSection(s.id)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeSection === s.id ? 'bg-emerald-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+            className={`px-4 py-2 rounded-[14px] text-sm font-medium transition-colors ${
+              activeSection === s.id ? 'bg-white text-black' : 'bg-[#121214] text-zinc-400 hover:text-white'
             }`}
           >
             {s.label}
@@ -32,7 +32,7 @@ export default function InstallationGuide() {
 
       {activeSection === 'prereq' && (
         <div className="space-y-4">
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+          <div className="bg-[#121214] rounded-[20px] p-6 border border-white/[0.08]">
             <h3 className="text-white font-semibold mb-4">📋 必要軟體</h3>
             <div className="space-y-3">
               {[
@@ -41,19 +41,19 @@ export default function InstallationGuide() {
                 { name: 'FFmpeg', desc: '音訊格式轉換', check: 'ffmpeg -version' },
                 { name: 'NVIDIA API Key', desc: 'build.nvidia.com 註冊取得', check: '（雲端模式需要）' },
               ].map((item, i) => (
-                <div key={i} className="flex items-center gap-4 p-3 bg-gray-900 rounded-lg">
+                <div key={i} className="flex items-center gap-4 p-3 bg-[#0a0a0b] rounded-[14px]">
                   <div className="w-8 h-8 bg-blue-900/50 rounded flex items-center justify-center text-blue-300 text-sm font-bold">{i + 1}</div>
                   <div className="flex-1">
                     <p className="text-white text-sm font-medium">{item.name}</p>
-                    <p className="text-gray-400 text-xs">{item.desc}</p>
+                    <p className="text-zinc-400 text-xs">{item.desc}</p>
                   </div>
-                  <code className="text-xs text-emerald-400 bg-gray-800 px-2 py-1 rounded">{item.check}</code>
+                  <code className="text-xs text-zinc-100 bg-[#121214] px-2 py-1 rounded">{item.check}</code>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+          <div className="bg-[#121214] rounded-[20px] p-6 border border-white/[0.08]">
             <h3 className="text-white font-semibold mb-4">🔧 環境檢查指令（唯讀）</h3>
             <CodeBlock title="PowerShell - 環境檢查" code={`# 檢查 Python 版本
 python --version
@@ -77,7 +77,7 @@ nvcc --version
 wsl --status`} />
           </div>
 
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+          <div className="bg-[#121214] rounded-[20px] p-6 border border-white/[0.08]">
             <h3 className="text-white font-semibold mb-4">📦 FFmpeg Windows 安裝（免管理員）</h3>
             <CodeBlock title="PowerShell - 下載 FFmpeg" code={`# 方法1：使用 winget（Windows 10/11 內建）
 winget install Gyan.FFmpeg
@@ -98,9 +98,9 @@ ffmpeg -version`} />
 
       {activeSection === 'cloud' && (
         <div className="space-y-4">
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+          <div className="bg-[#121214] rounded-[20px] p-6 border border-white/[0.08]">
             <h3 className="text-white font-semibold mb-4">☁️ 雲端模式安裝（推薦）</h3>
-            <p className="text-gray-400 text-sm mb-4">無需 GPU，Windows 原生 Python 即可執行。</p>
+            <p className="text-zinc-400 text-sm mb-4">無需 GPU，Windows 原生 Python 即可執行。</p>
 
             <CodeBlock title="Step 1：建立專案目錄" code={`# 建立專案資料夾
 mkdir "$env:USERPROFILE\\meeting-transcriber-tw"
@@ -158,14 +158,14 @@ PORT=8000
 
       {activeSection === 'local' && (
         <div className="space-y-4">
-          <div className="bg-yellow-900/20 border border-yellow-800 rounded-xl p-4">
+          <div className="bg-yellow-900/20 border border-yellow-800 rounded-[20px] p-4">
             <p className="text-yellow-300 text-sm">
               ⚠️ 本地模式需要：Linux 環境（WSL2 或原生）+ NVIDIA GPU（Ampere 架構以上）+ Docker + NVIDIA Container Toolkit。
               NIM Container 已標示「End of Support」，建議使用雲端 API 或等待更新版本。
             </p>
           </div>
 
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+          <div className="bg-[#121214] rounded-[20px] p-6 border border-white/[0.08]">
             <h3 className="text-white font-semibold mb-4">🖥️ 本地 NIM Container 部署</h3>
 
             <CodeBlock title="WSL2 前置準備" code={`# 在 Windows PowerShell 中啟用 WSL2
@@ -210,7 +210,7 @@ curl http://localhost:8001/v2/health/ready`} />
 
       {activeSection === 'start' && (
         <div className="space-y-4">
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+          <div className="bg-[#121214] rounded-[20px] p-6 border border-white/[0.08]">
             <h3 className="text-white font-semibold mb-4">🚀 啟動系統</h3>
 
             <CodeBlock title="一鍵啟動（PowerShell）" code={`# 確保在專案目錄
@@ -295,14 +295,14 @@ function CodeBlock({ title, code }: { title: string; code: string }) {
 
   return (
     <div className="mb-4">
-      <div className="flex items-center justify-between bg-gray-900 px-4 py-2 rounded-t-lg border border-gray-700 border-b-0">
-        <span className="text-xs text-gray-400">{title}</span>
-        <button onClick={handleCopy} className="text-xs text-gray-400 hover:text-white transition-colors">
+      <div className="flex items-center justify-between bg-[#0a0a0b] px-4 py-2 rounded-t-lg border border-white/[0.08] border-b-0">
+        <span className="text-xs text-zinc-400">{title}</span>
+        <button onClick={handleCopy} className="text-xs text-zinc-400 hover:text-white transition-colors">
           {copied ? '✅ 已複製' : '📋 複製'}
         </button>
       </div>
-      <pre className="bg-gray-950 p-4 rounded-b-lg border border-gray-700 overflow-x-auto text-sm">
-        <code className="text-gray-300 font-mono text-xs leading-relaxed">{code}</code>
+      <pre className="bg-[#0a0a0b] p-4 rounded-b-lg border border-white/[0.08] overflow-x-auto text-sm">
+        <code className="text-zinc-300 font-mono text-xs leading-relaxed">{code}</code>
       </pre>
     </div>
   );

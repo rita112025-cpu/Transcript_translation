@@ -3,16 +3,16 @@ export default function Maintenance() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-white mb-2">🔧 Phase 5：維護及擴充指南</h2>
-        <p className="text-gray-400">系統長期維護、版本管理及功能擴充說明</p>
+        <p className="text-zinc-400">系統長期維護、版本管理及功能擴充說明</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Model Version */}
-        <div className="bg-gray-800 rounded-xl p-5 border border-gray-700">
-          <h3 className="text-emerald-400 font-semibold mb-3 flex items-center gap-2">
+        <div className="bg-[#121214] rounded-[20px] p-5 border border-white/[0.08]">
+          <h3 className="text-zinc-100 font-semibold mb-3 flex items-center gap-2">
             <span>🤖</span> 模型版本管理
           </h3>
-          <ul className="text-sm text-gray-300 space-y-2">
+          <ul className="text-sm text-zinc-300 space-y-2">
             <li>• 雲端 API 版本由 NVIDIA 管理，可能自動更新</li>
             <li>• 本地 NIM Container 需手動拉取新版本</li>
             <li>• 建議鎖定 function-id，避免 API 變更影響</li>
@@ -20,37 +20,37 @@ export default function Maintenance() {
             <li>• 保留模型版本記錄以便問題追溯</li>
             <li>• 測試新模型版本時使用獨立環境</li>
           </ul>
-          <div className="mt-3 p-2 bg-gray-900 rounded text-xs font-mono text-gray-400">
+          <div className="mt-3 p-2 bg-[#0a0a0b] rounded text-xs font-mono text-zinc-400">
             <p># 檢查模型版本</p>
-            <p className="text-emerald-400">curl https://api.nvcf.nvidia.com/v2/nim/nvidia/parakeet-ctc-0.6b-zh-tw</p>
+            <p className="text-zinc-100">curl https://api.nvcf.nvidia.com/v2/nim/nvidia/parakeet-ctc-0.6b-zh-tw</p>
           </div>
         </div>
 
         {/* Dependencies */}
-        <div className="bg-gray-800 rounded-xl p-5 border border-gray-700">
-          <h3 className="text-emerald-400 font-semibold mb-3 flex items-center gap-2">
+        <div className="bg-[#121214] rounded-[20px] p-5 border border-white/[0.08]">
+          <h3 className="text-zinc-100 font-semibold mb-3 flex items-center gap-2">
             <span>📦</span> Python 依賴更新
           </h3>
-          <ul className="text-sm text-gray-300 space-y-2">
-            <li>• 定期執行 <code className="text-emerald-400">pip list --outdated</code></li>
-            <li>• <code className="text-emerald-400">nvidia-riva-client</code> 需與 Riva 版本對應</li>
+          <ul className="text-sm text-zinc-300 space-y-2">
+            <li>• 定期執行 <code className="text-zinc-100">pip list --outdated</code></li>
+            <li>• <code className="text-zinc-100">nvidia-riva-client</code> 需與 Riva 版本對應</li>
             <li>• 更新前在測試環境驗證</li>
-            <li>• 使用 <code className="text-emerald-400">pip-tools</code> 或 <code className="text-emerald-400">poetry</code> 鎖定版本</li>
+            <li>• 使用 <code className="text-zinc-100">pip-tools</code> 或 <code className="text-zinc-100">poetry</code> 鎖定版本</li>
             <li>• 關注安全漏洞公告（pip-audit）</li>
             <li>• FFmpeg 版本影響音訊轉換相容性</li>
           </ul>
-          <div className="mt-3 p-2 bg-gray-900 rounded text-xs font-mono text-gray-400">
-            <p className="text-emerald-400">pip-audit</p>
-            <p className="text-emerald-400">pip list --outdated</p>
+          <div className="mt-3 p-2 bg-[#0a0a0b] rounded text-xs font-mono text-zinc-400">
+            <p className="text-zinc-100">pip-audit</p>
+            <p className="text-zinc-100">pip list --outdated</p>
           </div>
         </div>
 
         {/* API Endpoint */}
-        <div className="bg-gray-800 rounded-xl p-5 border border-gray-700">
-          <h3 className="text-emerald-400 font-semibold mb-3 flex items-center gap-2">
+        <div className="bg-[#121214] rounded-[20px] p-5 border border-white/[0.08]">
+          <h3 className="text-zinc-100 font-semibold mb-3 flex items-center gap-2">
             <span>🌐</span> API 端點變更風險
           </h3>
-          <ul className="text-sm text-gray-300 space-y-2">
+          <ul className="text-sm text-zinc-300 space-y-2">
             <li>• function-id 可能隨模型版本變更</li>
             <li>• gRPC proto 定義可能更新</li>
             <li>• 端點 URL 原則上穩定，但需監控</li>
@@ -64,11 +64,11 @@ export default function Maintenance() {
         </div>
 
         {/* Inference Failure */}
-        <div className="bg-gray-800 rounded-xl p-5 border border-gray-700">
-          <h3 className="text-emerald-400 font-semibold mb-3 flex items-center gap-2">
+        <div className="bg-[#121214] rounded-[20px] p-5 border border-white/[0.08]">
+          <h3 className="text-zinc-100 font-semibold mb-3 flex items-center gap-2">
             <span>⚠️</span> 推論失敗處理
           </h3>
-          <ul className="text-sm text-gray-300 space-y-2">
+          <ul className="text-sm text-zinc-300 space-y-2">
             <li>• 有限重試（指數退避，最多 3 次）</li>
             <li>• 不刪除原始音訊檔案</li>
             <li>• 記錄失敗原因至日誌（不含會議內容）</li>
@@ -76,7 +76,7 @@ export default function Maintenance() {
             <li>• 提供可操作的診斷建議</li>
             <li>• 支援從失敗點重新開始（斷點續傳）</li>
           </ul>
-          <div className="mt-3 p-2 bg-gray-900 rounded text-xs font-mono text-gray-400">
+          <div className="mt-3 p-2 bg-[#0a0a0b] rounded text-xs font-mono text-zinc-400">
             <p># 常見錯誤及處理</p>
             <p>• UNAUTHENTICATED → 檢查 API Key</p>
             <p>• DEADLINE_EXCEEDED → 增加逾時或分段</p>
@@ -85,11 +85,11 @@ export default function Maintenance() {
         </div>
 
         {/* Performance */}
-        <div className="bg-gray-800 rounded-xl p-5 border border-gray-700">
-          <h3 className="text-emerald-400 font-semibold mb-3 flex items-center gap-2">
+        <div className="bg-[#121214] rounded-[20px] p-5 border border-white/[0.08]">
+          <h3 className="text-zinc-100 font-semibold mb-3 flex items-center gap-2">
             <span>⚡</span> 長時間錄音效能瓶頸
           </h3>
-          <ul className="text-sm text-gray-300 space-y-2">
+          <ul className="text-sm text-zinc-300 space-y-2">
             <li>• <strong>記憶體：</strong>分段處理避免載入完整音訊</li>
             <li>• <strong>網路：</strong>頻寬限制影響雲端模式速度</li>
             <li>• <strong>磁碟 I/O：</strong>暫存檔寫入/讀取</li>
@@ -97,17 +97,17 @@ export default function Maintenance() {
             <li>• <strong>建議：</strong>30 分鐘以下直接處理，以上使用串流</li>
             <li>• <strong>監控：</strong>記錄每段處理時間及資源使用</li>
           </ul>
-          <div className="mt-3 p-2 bg-gray-900 rounded text-xs text-gray-400">
+          <div className="mt-3 p-2 bg-[#0a0a0b] rounded text-xs text-zinc-400">
             💡 60 分鐘錄音約需 3-5 分鐘處理（雲端模式，視網路速度）
           </div>
         </div>
 
         {/* Future Features */}
-        <div className="bg-gray-800 rounded-xl p-5 border border-gray-700">
-          <h3 className="text-emerald-400 font-semibold mb-3 flex items-center gap-2">
+        <div className="bg-[#121214] rounded-[20px] p-5 border border-white/[0.08]">
+          <h3 className="text-zinc-100 font-semibold mb-3 flex items-center gap-2">
             <span>🚀</span> 後續擴充方向
           </h3>
-          <ul className="text-sm text-gray-300 space-y-2">
+          <ul className="text-sm text-zinc-300 space-y-2">
             <li>• <strong>Speaker Diarization：</strong>整合 NeMo MSDD 或 pyannote</li>
             <li>• <strong>標點恢復：</strong>使用標點模型後處理（需揭露）</li>
             <li>• <strong>會議摘要：</strong>接入 LLM 產生摘要（需授權）</li>
@@ -122,7 +122,7 @@ export default function Maintenance() {
       </div>
 
       {/* Monitoring Checklist */}
-      <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+      <div className="bg-[#121214] rounded-[20px] p-6 border border-white/[0.08]">
         <h3 className="text-lg font-semibold text-white mb-4">📋 定期維護檢查清單</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {[
@@ -139,16 +139,16 @@ export default function Maintenance() {
             '評估模型版本更新需求',
             '測試長音訊處理效能',
           ].map((item, i) => (
-            <label key={i} className="flex items-center gap-3 p-2 bg-gray-900 rounded-lg cursor-pointer hover:bg-gray-750">
-              <input type="checkbox" className="w-4 h-4 rounded border-gray-600" />
-              <span className="text-sm text-gray-300">{item}</span>
+            <label key={i} className="flex items-center gap-3 p-2 bg-[#0a0a0b] rounded-[14px] cursor-pointer hover:bg-[#121214]">
+              <input type="checkbox" className="w-4 h-4 rounded border-white/15" />
+              <span className="text-sm text-zinc-300">{item}</span>
             </label>
           ))}
         </div>
       </div>
 
       {/* Troubleshooting */}
-      <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+      <div className="bg-[#121214] rounded-[20px] p-6 border border-white/[0.08]">
         <h3 className="text-lg font-semibold text-white mb-4">🔍 常見問題排解</h3>
         <div className="space-y-3">
           {[
@@ -177,11 +177,11 @@ export default function Maintenance() {
               a: '確認匯出使用 UTF-8 BOM 編碼。使用 VS Code 或 Notepad++ 開啟。'
             },
           ].map((item, i) => (
-            <details key={i} className="bg-gray-900 rounded-lg overflow-hidden">
-              <summary className="px-4 py-3 text-sm text-white cursor-pointer hover:bg-gray-750">
+            <details key={i} className="bg-[#0a0a0b] rounded-[14px] overflow-hidden">
+              <summary className="px-4 py-3 text-sm text-white cursor-pointer hover:bg-[#121214]">
                 ❓ {item.q}
               </summary>
-              <div className="px-4 py-3 text-sm text-gray-400 border-t border-gray-700">
+              <div className="px-4 py-3 text-sm text-zinc-400 border-t border-white/[0.08]">
                 💡 {item.a}
               </div>
             </details>

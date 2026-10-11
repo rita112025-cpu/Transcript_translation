@@ -1586,29 +1586,29 @@ export default function ProjectFiles() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-white mb-2">📁 Phase 5：完整專案檔案</h2>
-        <p className="text-gray-400">所有必要檔案的完整內容。可複製至專案目錄使用。</p>
+        <p className="text-zinc-400">所有必要檔案的完整內容。可複製至專案目錄使用。</p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-4">
         {/* File List */}
         <div className="lg:w-72 flex-shrink-0">
-          <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
-            <div className="p-3 border-b border-gray-700 bg-gray-900">
-              <h3 className="text-sm font-medium text-gray-300">專案結構</h3>
+          <div className="bg-[#121214] rounded-[20px] border border-white/[0.08] overflow-hidden">
+            <div className="p-3 border-b border-white/[0.08] bg-[#0a0a0b]">
+              <h3 className="text-sm font-medium text-zinc-300">專案結構</h3>
             </div>
             <div className="max-h-[600px] overflow-y-auto">
               {projectFiles.map((f, i) => (
                 <button
                   key={i}
                   onClick={() => setSelectedFile(i)}
-                  className={`w-full text-left px-4 py-2.5 text-sm border-b border-gray-700/50 transition-colors ${
+                  className={`w-full text-left px-4 py-2.5 text-sm border-b border-white/[0.08] transition-colors ${
                     selectedFile === i
-                      ? 'bg-emerald-900/30 text-emerald-300 border-l-2 border-l-emerald-500'
-                      : 'text-gray-400 hover:bg-gray-750 hover:text-white'
+                      ? 'bg-white/10 text-white border-l-2 border-l-white'
+                      : 'text-zinc-400 hover:bg-[#121214] hover:text-white'
                   }`}
                 >
                   <div className="font-mono text-xs">{f.path}</div>
-                  <div className="text-xs text-gray-500 mt-0.5">{f.description}</div>
+                  <div className="text-xs text-zinc-500 mt-0.5">{f.description}</div>
                 </button>
               ))}
             </div>
@@ -1617,21 +1617,21 @@ export default function ProjectFiles() {
 
         {/* File Content */}
         <div className="flex-1 min-w-0">
-          <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
-            <div className="flex items-center justify-between p-3 border-b border-gray-700 bg-gray-900">
+          <div className="bg-[#121214] rounded-[20px] border border-white/[0.08] overflow-hidden">
+            <div className="flex items-center justify-between p-3 border-b border-white/[0.08] bg-[#0a0a0b]">
               <div>
                 <span className="text-white font-mono text-sm">{file.path}</span>
-                <span className="text-gray-500 text-xs ml-3">{file.description}</span>
+                <span className="text-zinc-500 text-xs ml-3">{file.description}</span>
               </div>
               <button
                 onClick={handleCopy}
-                className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs rounded transition-colors"
+                className="px-3 py-1 bg-[#1a1a1e] hover:bg-[#27272a] text-zinc-300 text-xs rounded transition-colors"
               >
                 {copied ? '✅ 已複製' : '📋 複製全部'}
               </button>
             </div>
             <pre className="p-4 overflow-x-auto max-h-[600px] overflow-y-auto">
-              <code className="text-gray-300 font-mono text-xs leading-relaxed whitespace-pre">
+              <code className="text-zinc-300 font-mono text-xs leading-relaxed whitespace-pre">
                 {file.content}
               </code>
             </pre>
