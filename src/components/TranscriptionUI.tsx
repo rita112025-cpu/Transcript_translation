@@ -215,80 +215,110 @@ export default function TranscriptionUI() {
     : null;
   const startDisabled = !audioFile || isSubmitting || isRunning || (mode === 'cloud' && !consentGiven);
 
+  const modeOptions: { id: TranscriptionMode; title: string; sub: string; chips: string[] }[] = [
+    { id: 'local', title: '本地 NIM', sub: 'HTTP · 本機', chips: ['音訊不離開本機', '需啟動自架 NIM'] },
+    { id: 'cloud', title: '雲端 NVIDIA', sub: 'gRPC · 需同意', chips: ['預設停用', '需 API Key'] },
+  ];
+
+  const stageLabel = job ? job.status : 'idle';
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-white mb-2">🎙️ 轉錄介面</h2>
-        <p className="text-gray-400">上傳會議錄音，由後端呼叫 NVIDIA Parakeet-CTC-0.6B-zh-tw 進行語音辨識</p>
-      </div>
-
-      {/* Model Info */}
-      <div className="bg-gray-800 rounded-xl p-4 border border-gray-700 flex flex-wrap items-center gap-4">
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-400">模型：</span>
-          <span className="px-2 py-1 bg-emerald-900/50 text-emerald-300 text-xs rounded border border-emerald-700">
-            parakeet-ctc-0.6b-zh-tw
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-400">推論模式：</span>
-          <div className="flex gap-1">
-            <button
-              onClick={() => setMode('cloud')}
-              className={`px-3 py-1 text-xs rounded ${mode === 'cloud' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400'}`}
-            >
-              ☁️ 雲端 API
-            </button>
-            <button
-              onClick={() => setMode('local')}
-              className={`px-3 py-1 text-xs rounded ${mode === 'local' ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-400'}`}
-            >
-              🖥️ 本地 NIM
-            </button>
+    <div className="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-6">
+      {/* Left: controls */}
+      <div className="flex flex-col gap-5">
+        <section className="rounded-[24px] bg-[#121214] border border-white/[0.08] p-5 md:p-6 shadow-[0_20px_80px_rgba(0,0,0,0.5)]">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-[13px] font-bold tracking-[0.08em] uppercase font-mono text-zinc-300">模型與模式</h3>
+            <span className="text-[11px] text-zinc-500 font-mono">parakeet-ctc-0.6b-zh-tw</span>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-400">語言：</span>
-          <span className="text-xs text-gray-300">台灣華語 (zh-TW) + 中英混合</span>
-        </div>
-        {selectedModel && (
-          <p className={`text-xs w-full ${selectedModel.configured ? 'text-gray-400' : 'text-yellow-300'}`}>
-            {selectedModel.configured ? '✅ ' : '⚠️ '}
-            {selectedModel.status_message}
-          </p>
-        )}
-      </div>
+          <div className="flex flex-col gap-2.5">
+            {modeOptions.map((opt) => {
+              const selected = mode === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setMode(opt.id)}
+                  aria-pressed={selected}
+                  className={`text-left rounded-[16px] border p-4 flex items-start gap-3 transition ${
+                    selected ? 'bg-white text-black border-white' : 'bg-[#0f0f11] text-zinc-200 border-white/10 hover:border-white/25'
+                  }`}
+                >
+                  <span
+                    className={`mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                      selected ? 'border-black' : 'border-zinc-500'
+                    }`}
+                  >
+                    {selected && <span className="w-2 h-2 rounded-full bg-black" />}
+                  </span>
+                  <span className="flex-1 min-w-0">
+                    <span className="flex items-center justify-between gap-2">
+                      <span className="text-[14px] font-medium">{opt.title}</span>
+                      <span className={`text-[11px] font-mono ${selected ? 'text-zinc-600' : 'text-zinc-500'}`}>{opt.sub}</span>
+                    </span>
+                    <span className="mt-2 flex flex-wrap gap-1.5">
+                      {opt.chips.map((chip) => (
+                        <span
+                          key={chip}
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${
+                            selected ? 'bg-black/10 text-zinc-800' : 'bg-white/10 text-zinc-300'
+                          }`}
+                        >
+                          {chip}
+                        </span>
+                      ))}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          {selectedModel && (
+            <div
+              className={`mt-3 flex gap-2 text-[11px] rounded-xl p-2.5 border ${
+                selectedModel.configured
+                  ? 'text-zinc-400 bg-white/[0.03] border-white/10'
+                  : 'text-amber-300 bg-amber-500/10 border-amber-500/20'
+              }`}
+            >
+              <span>{selectedModel.configured ? '✅' : '⚠️'}</span>
+              <span>{selectedModel.status_message}</span>
+            </div>
+          )}
+        </section>
 
-      {/* Upload Section */}
-      <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-        <h3 className="text-white font-semibold mb-4">📂 音訊匯入</h3>
+        <section className="rounded-[24px] bg-[#121214] border border-white/[0.08] p-5 md:p-6 shadow-[0_20px_80px_rgba(0,0,0,0.5)]">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-[13px] font-bold tracking-[0.08em] uppercase font-mono text-zinc-300">音訊匯入</h3>
+            <span className="text-[11px] text-zinc-500 font-mono">≤ 500MB</span>
+          </div>
 
-        <div
-          onClick={() => fileInputRef.current?.click()}
-          className="border-2 border-dashed border-gray-600 rounded-xl p-8 text-center cursor-pointer hover:border-emerald-500 transition-colors"
-        >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept={ACCEPTED_EXTENSIONS.join(',')}
-            onChange={handleFileSelect}
-            className="hidden"
-          />
-          <div className="text-4xl mb-3">🎵</div>
-          <p className="text-gray-300">點擊或拖曳音訊檔案至此</p>
-          <p className="text-gray-500 text-sm mt-1">支援 WAV、MP3、M4A、MP4（擷取音訊）、FLAC、OGG（最大 500MB）</p>
-        </div>
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            className="rounded-[16px] border border-dashed border-white/20 bg-[#0f0f11] p-8 text-center cursor-pointer hover:border-white/50 transition"
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept={ACCEPTED_EXTENSIONS.join(',')}
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+            <div className="w-12 h-12 mx-auto rounded-[14px] bg-white text-black grid place-items-center text-xl">🎵</div>
+            <p className="mt-3 text-[14px] font-medium">點擊或拖曳音訊檔案至此</p>
+            <p className="mt-1 text-[11px] text-zinc-500 font-mono">WAV · MP3 · M4A · MP4 · FLAC · OGG</p>
+          </div>
 
-        {audioFile && (
-          <div className="mt-4 p-4 bg-gray-900 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-white font-medium">{audioFile.name}</p>
-                <p className="text-gray-400 text-sm">
-                  大小：{formatSize(audioFile.size)} | 時長：
+          {audioFile && (
+            <div className="mt-4 rounded-[14px] bg-[#1a1a1e] border border-white/10 p-3 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-[10px] bg-white/10 grid place-items-center">🎧</div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-medium truncate">{audioFile.name}</p>
+                <p className="text-[11px] text-zinc-500 font-mono mt-0.5">
+                  {formatSize(audioFile.size)} ·{' '}
                   {job?.result?.duration_seconds != null
                     ? formatHms(job.result.duration_seconds)
-                    : '（轉錄後由音訊實際長度顯示）'}
+                    : '時長轉錄後顯示'}
                 </p>
               </div>
               <button
@@ -298,176 +328,180 @@ export default function TranscriptionUI() {
                   if (fileInputRef.current) fileInputRef.current.value = '';
                 }}
                 disabled={isRunning}
-                className="text-red-400 hover:text-red-300 text-sm disabled:text-gray-600"
+                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/15 text-zinc-300 text-xs disabled:opacity-40"
+                aria-label="移除音訊"
               >
-                ✕ 移除
+                ✕
               </button>
             </div>
-          </div>
-        )}
+          )}
 
-        {error && (
-          <div className="mt-3 p-3 bg-red-900/30 border border-red-800 rounded-lg text-red-300 text-sm">{error}</div>
-        )}
+          {error && (
+            <div className="mt-3 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-[12px] text-red-200">{error}</div>
+          )}
+
+          {mode === 'cloud' && audioFile && (
+            <label className="mt-4 flex gap-3 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={consentGiven}
+                onChange={(e) => setConsentGiven(e.target.checked)}
+                className="mt-0.5 w-4 h-4"
+              />
+              <span className="text-[12px] text-amber-200 leading-relaxed">
+                <span className="font-semibold text-amber-300">⚠️ 資料傳輸授權</span>：雲端模式會由後端把音訊傳送至您在後端 .env
+                設定的 NVIDIA 服務端點進行辨識，音訊內容將由 NVIDIA 服務處理。請確認您有權授權此資料傳輸。
+              </span>
+            </label>
+          )}
+
+          <button
+            onClick={handleStart}
+            disabled={startDisabled}
+            className="mt-5 w-full h-12 rounded-full bg-white text-black text-[13px] font-bold uppercase tracking-[0.08em] font-mono hover:bg-zinc-200 disabled:bg-white/10 disabled:text-zinc-500 transition"
+          >
+            {isSubmitting || isRunning ? '⏳ 轉錄中…' : '🚀 開始轉錄'}
+          </button>
+        </section>
       </div>
 
-      {/* Consent & Start */}
-      {mode === 'cloud' && audioFile && (
-        <div className="bg-yellow-900/20 border border-yellow-800 rounded-xl p-4">
-          <label className="flex items-start gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={consentGiven}
-              onChange={(e) => setConsentGiven(e.target.checked)}
-              className="mt-1 w-4 h-4 rounded border-gray-600"
-            />
-            <div className="text-sm">
-              <p className="text-yellow-300 font-medium">⚠️ 資料傳輸授權</p>
-              <p className="text-gray-400 mt-1">
-                雲端模式會由後端把音訊傳送至您在後端 .env 設定的 NVIDIA 服務端點進行辨識，
-                音訊內容將由 NVIDIA 服務處理。請確認您有權授權此資料傳輸。
-              </p>
-            </div>
-          </label>
-        </div>
-      )}
-
-      <button
-        onClick={handleStart}
-        disabled={startDisabled}
-        className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-700 disabled:text-gray-500 text-white font-semibold rounded-xl transition-colors"
-      >
-        {isSubmitting || isRunning ? '⏳ 轉錄中...' : '🚀 開始轉錄'}
-      </button>
-
-      {/* Real job status: stages from the backend, never a timer */}
-      {job && (
-        <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
-          <div className="flex justify-between text-sm mb-2">
-            <span className="text-gray-300">{job.message}</span>
-            <span className="text-emerald-400 text-xs">{job.status}</span>
+      {/* Right: status and transcript */}
+      <div className="flex flex-col gap-5 min-w-0">
+        <section className="rounded-[24px] bg-[#121214] border border-white/[0.08] p-5 md:p-6">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-[13px] font-bold tracking-[0.08em] uppercase font-mono text-zinc-300">任務狀態</h3>
+            <span className="px-2.5 py-1 rounded-full bg-[#1a1a1d] border border-white/10 text-[10px] font-mono tracking-[0.08em] uppercase flex items-center gap-1.5">
+              <span className={`w-1.5 h-1.5 rounded-full ${isRunning ? 'bg-emerald-400 animate-pulse' : job?.status === 'failed' ? 'bg-red-400' : 'bg-zinc-500'}`} />
+              {stageLabel}
+            </span>
           </div>
-          <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
-            {job.status === 'transcribing' && job.progress && job.progress.total_chunks > 0 ? (
-              <div
-                className="bg-emerald-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(job.progress.completed_chunks / job.progress.total_chunks) * 100}%` }}
-              />
-            ) : isRunning ? (
-              <div className="bg-emerald-500/70 h-2 rounded-full w-1/3 animate-pulse" />
-            ) : job.status === 'completed' ? (
-              <div className="bg-emerald-500 h-2 rounded-full w-full" />
-            ) : (
-              <div className="bg-red-500 h-2 rounded-full w-full" />
-            )}
-          </div>
-          {job.status === 'failed' && (
-            <div className="mt-3 p-3 bg-red-900/30 border border-red-800 rounded-lg text-red-300 text-sm">
-              ❌ 轉錄失敗：{job.error}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Transcript */}
-      {job?.status === 'completed' && (
-        <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
-          <div className="p-4 border-b border-gray-700 flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-3 flex-wrap">
-              <h3 className="text-white font-semibold">📝 逐字稿</h3>
-              <span className="text-xs text-gray-400">
-                來源：{job.result?.mode === 'cloud' ? '☁️ 雲端 NVIDIA（gRPC）' : '🖥️ 本地 NIM（HTTP）'}
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={showRaw}
-                  onChange={(e) => setShowRaw(e.target.checked)}
-                  className="w-3.5 h-3.5 rounded"
-                />
-                顯示原始 ASR
-              </label>
-              <select
-                value={exportFormat}
-                onChange={(e) => setExportFormat(e.target.value as ExportFormat)}
-                className="bg-gray-700 text-gray-300 text-xs rounded px-2 py-1 border border-gray-600"
-              >
-                <option value="txt">TXT</option>
-                <option value="srt">SRT</option>
-                <option value="vtt">VTT</option>
-                <option value="json">JSON</option>
-              </select>
-              <button
-                onClick={handleExport}
-                disabled={segments.length === 0 || blockedReason !== null}
-                title={blockedReason ?? undefined}
-                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-700 disabled:text-gray-500 text-white text-xs rounded transition-colors"
-              >
-                📥 匯出
-              </button>
-            </div>
-          </div>
-
-          {blockedReason && (
-            <div className="px-4 py-2 text-xs text-yellow-300 bg-yellow-900/20 border-b border-gray-700">
-              ⚠️ {blockedReason}
-            </div>
-          )}
-
-          {segments.length === 0 ? (
-            <div className="p-6 text-sm text-gray-400">
-              模型沒有回傳任何文字。音訊可能沒有可辨識的語音，或模型輸出為空。
-            </div>
+          {job ? (
+            <>
+              <p className="text-[13px] text-zinc-300">{job.message}</p>
+              <div className="mt-3 w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
+                {job.status === 'transcribing' && job.progress && job.progress.total_chunks > 0 ? (
+                  <div
+                    className="bg-white h-1.5 rounded-full transition-all duration-300"
+                    style={{ width: `${(job.progress.completed_chunks / job.progress.total_chunks) * 100}%` }}
+                  />
+                ) : isRunning ? (
+                  <div className="bg-white/60 h-1.5 w-1/3 rounded-full animate-pulse" />
+                ) : job.status === 'completed' ? (
+                  <div className="bg-white h-1.5 w-full rounded-full" />
+                ) : (
+                  <div className="bg-red-500 h-1.5 w-full rounded-full" />
+                )}
+              </div>
+              {job.status === 'failed' && (
+                <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-[12px] text-red-200">
+                  ❌ 轉錄失敗：{job.error}
+                </div>
+              )}
+            </>
           ) : (
-            <div className="divide-y divide-gray-700 max-h-96 overflow-y-auto">
-              {segments.map((seg) => {
-                const edited = Object.prototype.hasOwnProperty.call(edits, seg.id);
-                return (
-                  <div key={seg.id} className="p-4 hover:bg-gray-750 group">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-emerald-400 text-xs font-mono">[{formatHms(seg.start)}]</span>
-                      <span className="text-gray-500 text-xs">→ [{formatHms(seg.end)}]</span>
-                      <span className="text-gray-500 text-xs">| 講者未識別</span>
-                      {edited && <span className="text-yellow-400 text-xs">✏️ 已編輯</span>}
-                    </div>
-                    {editingId === seg.id ? (
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={displayTextOf(seg, edits)}
-                          onChange={(e) => handleEdit(seg.id, e.target.value)}
-                          className="flex-1 bg-gray-900 border border-gray-600 rounded px-3 py-1 text-sm text-white"
-                          autoFocus
-                        />
-                        <button
-                          onClick={() => setEditingId(null)}
-                          className="px-2 py-1 bg-emerald-600 text-white text-xs rounded"
-                        >
-                          完成
-                        </button>
-                      </div>
-                    ) : (
-                      <p
-                        className="text-gray-200 text-sm cursor-pointer hover:text-white"
-                        onClick={() => setEditingId(seg.id)}
-                        title="點擊編輯"
-                      >
-                        {showRaw ? seg.raw_text : displayTextOf(seg, edits)}
-                      </p>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+            <p className="text-[12px] text-zinc-500 font-mono">尚未開始。選擇模式、上傳音訊後按「開始轉錄」。</p>
           )}
+        </section>
 
-          <div className="p-3 bg-gray-900 text-xs text-gray-500 border-t border-gray-700">
-            💡 提示：時間戳為各分段在音訊中的實際起訖位置（非逐詞時間戳）。點擊文字可編輯。TXT / SRT / VTT 匯出校正後文字；JSON 同時保留校正文字（text）與原始模型輸出（raw_text）。
-          </div>
-        </div>
-      )}
+        {job?.status === 'completed' && (
+          <section className="rounded-[24px] bg-[#121214] border border-white/[0.08] overflow-hidden">
+            <div className="p-5 md:p-6 border-b border-white/[0.08] flex items-center justify-between flex-wrap gap-3">
+              <div className="flex items-center gap-3 flex-wrap">
+                <h3 className="text-[13px] font-bold tracking-[0.08em] uppercase font-mono text-zinc-300">逐字稿</h3>
+                <span className="px-2 py-0.5 rounded-full bg-white/10 text-[10px] font-mono text-zinc-300">
+                  來源：{job.result?.mode === 'cloud' ? '雲端 NVIDIA（gRPC）' : '本地 NIM（HTTP）'}
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <label className="flex items-center gap-2 text-[12px] text-zinc-400 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={showRaw}
+                    onChange={(e) => setShowRaw(e.target.checked)}
+                    className="w-3.5 h-3.5"
+                  />
+                  原始 ASR
+                </label>
+                <select
+                  value={exportFormat}
+                  onChange={(e) => setExportFormat(e.target.value as ExportFormat)}
+                  className="bg-[#1a1a1e] text-zinc-200 text-[11px] font-mono rounded-full border border-white/10 px-3 py-1"
+                >
+                  <option value="txt">TXT</option>
+                  <option value="srt">SRT</option>
+                  <option value="vtt">VTT</option>
+                  <option value="json">JSON</option>
+                </select>
+                <button
+                  onClick={handleExport}
+                  disabled={segments.length === 0 || blockedReason !== null}
+                  title={blockedReason ?? undefined}
+                  className="px-4 py-1.5 rounded-full bg-white text-black text-[11px] font-bold uppercase tracking-[0.08em] font-mono hover:bg-zinc-200 disabled:bg-white/10 disabled:text-zinc-500"
+                >
+                  匯出
+                </button>
+              </div>
+            </div>
+
+            {blockedReason && (
+              <div className="px-5 py-2 text-[12px] text-amber-300 bg-amber-500/10 border-b border-white/[0.08]">
+                ⚠️ {blockedReason}
+              </div>
+            )}
+
+            {segments.length === 0 ? (
+              <div className="p-6 text-[13px] text-zinc-400">
+                模型沒有回傳任何文字。音訊可能沒有可辨識的語音，或模型輸出為空。
+              </div>
+            ) : (
+              <div className="divide-y divide-white/[0.06] max-h-[520px] overflow-y-auto">
+                {segments.map((seg) => {
+                  const edited = Object.prototype.hasOwnProperty.call(edits, seg.id);
+                  return (
+                    <div key={seg.id} className="p-5">
+                      <div className="flex items-center gap-2 mb-1.5 font-mono text-[11px] text-zinc-500">
+                        <span className="text-zinc-200">[{formatHms(seg.start)}]</span>
+                        <span>→ [{formatHms(seg.end)}]</span>
+                        <span>| 講者未識別</span>
+                        {edited && <span className="text-amber-300 font-sans">✏️ 已編輯</span>}
+                      </div>
+                      {editingId === seg.id ? (
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={displayTextOf(seg, edits)}
+                            onChange={(e) => handleEdit(seg.id, e.target.value)}
+                            className="flex-1 bg-[#0f0f11] text-zinc-100 border border-white/20 rounded-[10px] px-3 py-1.5 text-sm"
+                            autoFocus
+                          />
+                          <button
+                            onClick={() => setEditingId(null)}
+                            className="px-3 py-1 rounded-full bg-white text-black text-xs font-bold"
+                          >
+                            完成
+                          </button>
+                        </div>
+                      ) : (
+                        <p
+                          className="text-[14px] leading-relaxed text-zinc-100 cursor-pointer hover:text-white"
+                          onClick={() => setEditingId(seg.id)}
+                          title="點擊編輯"
+                        >
+                          {showRaw ? seg.raw_text : displayTextOf(seg, edits)}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="p-3 bg-black/40 text-[11px] text-zinc-500 border-t border-white/[0.08] font-mono">
+              時間戳為分段在音訊中的實際起訖位置（非逐詞）。TXT / SRT / VTT 匯出校正後文字；JSON 同時保留 text 與 raw_text。
+            </div>
+          </section>
+        )}
+      </div>
     </div>
   );
 }
