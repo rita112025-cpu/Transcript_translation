@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import math
 import re
 import shutil
 import uuid
@@ -10,18 +11,23 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 
 from backend.config import Settings, get_settings
 from backend.schemas import HealthResponse, JobResponse, Mode, ModelInfo
 from backend.services import audio
 from backend.services.audio import AudioError
 from backend.services.providers.registry import AuthorizationError, authorize_mode, list_models
+from backend.services.rate_limit import RateLimiter
 from backend.services.transcription import TranscriptionService
 
 APP_VERSION = "1.0.0"
 UPLOAD_CHUNK_BYTES = 1024 * 1024
 JOB_ID_PATTERN = re.compile(r"^[0-9a-f]{32}$")
+# Only browsers served from the loopback interface (any port, since start.bat picks free ports) may call the API.
+LOOPBACK_ORIGIN_PATTERN = r"^https?://(127\.0\.0\.1|localhost)(:\d+)?$"
+RATE_LIMIT_MESSAGE = "請求過於頻繁，請稍後再試"
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger("backend")
@@ -43,6 +49,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     _remove_stale_job_dirs(settings.work_dir)
     service = TranscriptionService(settings)
     app.state.service = service
+    app.state.rate_limiter = RateLimiter(
+        [(settings.rate_limit_per_minute, 60), (settings.rate_limit_per_hour, 3600)]
+    )
     logger.info("Backend ready. Work dir: %s", settings.work_dir)
     try:
         yield
@@ -51,6 +60,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="Meeting Transcriber TW API", version=APP_VERSION, lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origin_regex=LOOPBACK_ORIGIN_PATTERN,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type"],
+)
 
 
 def _settings() -> Settings:
@@ -59,6 +74,17 @@ def _settings() -> Settings:
 
 def _service() -> TranscriptionService:
     return app.state.service
+
+
+def _enforce_rate_limit(request: Request) -> None:
+    client = request.client.host if request.client else "unknown"
+    retry_after = app.state.rate_limiter.check(client)
+    if retry_after is not None:
+        raise HTTPException(
+            status_code=429,
+            detail=RATE_LIMIT_MESSAGE,
+            headers={"Retry-After": str(math.ceil(retry_after))},
+        )
 
 
 @app.get("/api/health", response_model=HealthResponse)
@@ -79,10 +105,12 @@ def models() -> list[ModelInfo]:
 
 @app.post("/api/transcriptions", response_model=JobResponse, status_code=202)
 async def create_transcription(
+    request: Request,
     file: UploadFile = File(...),
     mode: str = Form("local"),
     consent: bool = Form(False),
 ) -> JobResponse:
+    _enforce_rate_limit(request)
     settings = _settings()
     if mode not in ("cloud", "local"):
         raise HTTPException(status_code=400, detail=f"不支援的推論模式：{mode}")

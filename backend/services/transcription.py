@@ -1,8 +1,8 @@
 """Background transcription jobs: validation → conversion → chunked model calls → result.
 
-Jobs live in process memory. A restart loses queued and finished jobs, so this is not a
-persistent queue. One worker thread runs jobs in order so that the NIM service is not
-overloaded; API requests never wait on it.
+Job snapshots are mirrored to SQLite so finished results survive a restart. Jobs that were still
+running at restart are marked failed, because the audio is not resumed. One worker thread runs jobs
+in order so that the NIM service is not overloaded; API requests never wait on it.
 """
 
 from __future__ import annotations
@@ -30,11 +30,13 @@ from backend.schemas import (
 from backend.services import audio
 from backend.services.audio import AudioChunk, AudioError
 from backend.services.providers.base import ProviderError, TranscriptionProvider
+from backend.services.job_store import JobStore
 from backend.services.providers.registry import MODEL_ID, AuthorizationError, authorize_mode, build_provider
 
 logger = logging.getLogger(__name__)
 
 MAX_RETAINED_JOBS = 50
+INTERRUPTED_MESSAGE = "後端重啟，任務已中斷，請重新上傳"
 STATUS_MESSAGES: dict[JobStatus, str] = {
     "queued": "等待處理",
     "validating": "音訊驗證中",
@@ -168,7 +170,24 @@ class TranscriptionService:
         self._provider_factory = provider_factory
         self._jobs: dict[str, _Job] = {}
         self._lock = threading.Lock()
+        self._store = JobStore(settings.job_db_path)
+        self._mark_interrupted_jobs()
         self._executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="transcribe")
+
+    def _mark_interrupted_jobs(self) -> None:
+        for job in self._store.load_unfinished():
+            logger.warning("Job %s was interrupted by a restart", job.job_id)
+            self._store.save(
+                job.model_copy(
+                    update={
+                        "status": "failed",
+                        "message": STATUS_MESSAGES["failed"],
+                        "progress": None,
+                        "error": INTERRUPTED_MESSAGE,
+                        "updated_at": _now(),
+                    }
+                )
+            )
 
     def shutdown(self) -> None:
         self._executor.shutdown(wait=False, cancel_futures=True)
@@ -190,19 +209,23 @@ class TranscriptionService:
             self._prune_locked()
             self._jobs[job_id] = job
             snapshot = self._snapshot_locked(job)
+            self._store.save(snapshot)
         self._executor.submit(self._run, job_id)
         return snapshot
 
     def get(self, job_id: str) -> JobResponse | None:
         with self._lock:
             job = self._jobs.get(job_id)
-            return self._snapshot_locked(job) if job else None
+            if job is not None:
+                return self._snapshot_locked(job)
+        return self._store.load(job_id)
 
     def _prune_locked(self) -> None:
         finished = [j for j in self._jobs.values() if j.status in ("completed", "failed")]
         overflow = len(self._jobs) - MAX_RETAINED_JOBS + 1
         for job in sorted(finished, key=lambda j: j.updated_at)[: max(overflow, 0)]:
             self._jobs.pop(job.job_id, None)
+        self._store.prune_finished(MAX_RETAINED_JOBS)
 
     def _set_status(
         self,
@@ -222,6 +245,7 @@ class TranscriptionService:
             job.error = error
             job.result = result
             job.updated_at = _now()
+            self._store.save(self._snapshot_locked(job))
 
     def _snapshot_locked(self, job: _Job) -> JobResponse:
         return JobResponse(

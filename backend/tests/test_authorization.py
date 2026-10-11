@@ -40,6 +40,7 @@ def _settings(tmp_path: Path, **overrides: Any) -> Settings:
         nvidia_grpc_server="grpc.nvcf.nvidia.com:443",
         nvidia_grpc_function_id="8473f56d-51ef-473c-bb26-efd4f5def2bf",
         nvidia_api_key="",
+        job_db_path=tmp_path / "jobs.sqlite3",
     )
     return replace(base, **overrides)
 
