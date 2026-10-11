@@ -3,3 +3,28 @@ node_modules/
 dist/
 build/
 *.log
+logs/
+
+# Secrets and runtime data: never commit
+.env
+tools/
+backend/data/
+backend/.venv/
+.venv/
+
+# Audio, transcripts and exports must never enter Git
+*.wav
+*.mp3
+*.m4a
+*.mp4
+*.flac
+*.ogg
+*.srt
+*.vtt
+
+# Python caches
+__pycache__/
+.pytest_cache/
+
+# Local NVIDIA NIM testing (sample audio and nested sample repo)
+/nim_test/
