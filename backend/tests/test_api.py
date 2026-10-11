@@ -42,6 +42,7 @@ def _settings(tmp_path: Path, **overrides: object) -> Settings:
         nvidia_grpc_server="grpc.nvcf.nvidia.com:443",
         nvidia_grpc_function_id="8473f56d-51ef-473c-bb26-efd4f5def2bf",
         nvidia_api_key="",
+        job_db_path=tmp_path / "jobs.sqlite3",
     )
     return replace(base, **overrides)  # type: ignore[arg-type]
 
@@ -145,6 +146,33 @@ def test_unknown_and_malformed_job_ids_return_404(client_factory, tmp_path: Path
     with client_factory(_settings(tmp_path)) as client:
         assert client.get("/api/transcriptions/" + "a" * 32).status_code == 404
         assert client.get("/api/transcriptions/../../etc").status_code == 404
+
+
+def test_upload_rate_limit_returns_429_with_retry_after(client_factory, tmp_path: Path) -> None:  # type: ignore[no-untyped-def]
+    upload = {"file": ("a.exe", b"x", "application/octet-stream")}
+    with client_factory(_settings(tmp_path, rate_limit_per_minute=2)) as client:
+        first = client.post("/api/transcriptions", files=upload)
+        second = client.post("/api/transcriptions", files=upload)  # rejected by validation, still counted
+        limited = client.post("/api/transcriptions", files=upload)
+
+    assert [first.status_code, second.status_code] == [415, 415]
+    assert limited.status_code == 429
+    assert int(limited.headers["Retry-After"]) > 0
+
+
+def test_cors_allows_loopback_origin_only(client_factory, tmp_path: Path) -> None:  # type: ignore[no-untyped-def]
+    with client_factory(_settings(tmp_path)) as client:
+        allowed = client.options(
+            "/api/transcriptions",
+            headers={"Origin": "http://127.0.0.1:3005", "Access-Control-Request-Method": "POST"},
+        )
+        blocked = client.options(
+            "/api/transcriptions",
+            headers={"Origin": "https://evil.example", "Access-Control-Request-Method": "POST"},
+        )
+
+    assert allowed.headers.get("access-control-allow-origin") == "http://127.0.0.1:3005"
+    assert "access-control-allow-origin" not in blocked.headers
 
 
 class _FakeNim(http.server.BaseHTTPRequestHandler):

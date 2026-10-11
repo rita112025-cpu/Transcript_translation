@@ -64,6 +64,9 @@ class Settings:
     nvidia_grpc_server: str
     nvidia_grpc_function_id: str
     nvidia_api_key: str
+    job_db_path: Path = BACKEND_DIR / "data" / "jobs.sqlite3"
+    rate_limit_per_minute: int = 3
+    rate_limit_per_hour: int = 20
 
     @property
     def max_upload_bytes(self) -> int:
@@ -89,12 +92,17 @@ def load_settings() -> Settings:
         nvidia_grpc_server=_env_str("NVIDIA_GRPC_SERVER", "grpc.nvcf.nvidia.com:443"),
         nvidia_grpc_function_id=_env_str("NVIDIA_GRPC_FUNCTION_ID", "8473f56d-51ef-473c-bb26-efd4f5def2bf"),
         nvidia_api_key=_env_str("NVIDIA_API_KEY", ""),
+        job_db_path=Path(_env_str("JOB_DB_PATH", str(BACKEND_DIR / "data" / "jobs.sqlite3"))),
+        rate_limit_per_minute=_env_int("RATE_LIMIT_PER_MINUTE", 3),
+        rate_limit_per_hour=_env_int("RATE_LIMIT_PER_HOUR", 20),
     )
 
     if settings.chunk_seconds <= 0 or settings.max_upload_mb <= 0:
         raise ValueError("NIM_CHUNK_SECONDS 與 MAX_UPLOAD_MB 必須大於 0")
     if settings.max_retries < 0 or settings.retry_backoff_seconds < 0:
         raise ValueError("NIM_MAX_RETRIES 與 NIM_RETRY_BACKOFF_SECONDS 不可為負數")
+    if settings.rate_limit_per_minute < 0 or settings.rate_limit_per_hour < 0:
+        raise ValueError("RATE_LIMIT_PER_MINUTE 與 RATE_LIMIT_PER_HOUR 不可為負數（0 表示停用）")
     return settings
 
 
